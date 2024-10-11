@@ -1,0 +1,25 @@
+name: panvimdoc
+
+on: [push]
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    name: pandoc to vimdoc
+    steps:
+      - uses: actions/checkout@v2
+      - name: panvimdoc
+        uses: kdheepak/panvimdoc@main
+        with:
+          vimdoc: letitsnow.nvim # Output vimdoc project name (required)
+          # The following are all optional
+          pandoc: "README.md" # Input pandoc file
+          toc: true # Table of contents
+          description: "" # Project description used in title (if empty, uses neovim version and current date)
+          titledatepattern: "%Y %B %d" # Pattern for the date that used in the title
+          dedupsubheadings: true # Add heading to subheading anchor links to ensure that subheadings are unique
+          treesitter: true # Use treesitter for highlighting codeblocks
+          docmappingprojectname: true # Use project name in tag when writing mapping docs
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit-message: auto-generate vimdoc
