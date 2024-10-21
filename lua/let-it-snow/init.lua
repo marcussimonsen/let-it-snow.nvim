@@ -1,5 +1,5 @@
-local settings = require("letitsnow.settings")
-local snow = require("letitsnow.snow")
+local settings = require("let-it-snow.settings")
+local snow = require("let-it-snow.snow")
 
 local M = {}
 

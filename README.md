@@ -1,4 +1,4 @@
-# letitsnow.nvim
+#  et-it-snow.nvim
 
 A Neovim plugin written in Lua to bring winter "hygge" into your editor.
 
@@ -12,15 +12,15 @@ While sitting there and wondering how you will ever solve this problem, your
 code is just sitting there, staring you in the face.
 Wouldn't it be nice if you could bring some of the winter cozyness into your
 editor?
-This is the vision of *letitsnow.nvim*.
-*letitsnow.nvim* attempts to solve this by letting it snow directly in your
+This is the vision of *let-it-snow.nvim*.
+*let-it-snow.nvim* attempts to solve this by letting it snow directly in your
 editor, bringing some fluffyness into your code.
 
 ## Installation
 
 ```lua
 {
-    "marcussimonsen/letitsnow.nvim",
+    "marcussimonsen/let-it-snow.nvim",
     cmd = "LetItSnow" -- Wait with loading until command is run
     opts = {},
 }
@@ -28,8 +28,8 @@ editor, bringing some fluffyness into your code.
 
 ## How to run
 
-The only function available in *letitsnow.nvim* is `LetItSnow` which is meant to
-*help bring you some "hygge" into your editor :)
+The only function available in *let-it-snow.nvim* is `LetItSnow` which is meant
+to *help bring you some "hygge" into your editor :)
 
 ## Inspiration:
 
