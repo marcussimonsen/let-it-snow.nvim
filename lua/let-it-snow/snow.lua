@@ -109,7 +109,7 @@ local function _inside_grid(row, col, grid)
 end
 
 local function _obstructed(row, col, lines, grid)
-	assert(_inside_grid(row, col, grid), string.format("Onbstruction chech outside of grid at: %d, %d", row, col))
+	assert(_inside_grid(row, col, grid), string.format("Obstruction check outside of grid at: %d, %d", row, col))
 	return col < #lines[row] and lines[row][col] ~= " "
 end
 
