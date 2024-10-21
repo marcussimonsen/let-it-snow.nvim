@@ -113,6 +113,15 @@ local function _obstructed(row, col, lines, grid)
 	return col < #lines[row] and lines[row][col] ~= " "
 end
 
+local function _spawn_snowflake(grid, lines)
+	local x = nil
+    -- `lines` is 1-based, so check if obstructed at line 1 (uppermost line)
+	while x == nil or _obstructed(1, x, lines, grid) do
+		x = math.random(0, #grid[0] - 1)
+	end
+	grid[0][x] = grid[0][x] + 1
+end
+
 local function _update_snowflake(row, col, old_grid, new_grid, lines)
 	local below = nil
 	local below_a = nil
@@ -220,10 +229,7 @@ local function _update_grid(win, buf, old_grid)
 
 	local new_grid = _make_grid(height, width)
 
-	-- Spawn new snowflake
-	-- WARN: This should maybe be += 1?
-	-- FIXME: Don't spawn snowflakes inside top line
-	new_grid[0][math.random(0, width - 1)] = 1
+	_spawn_snowflake(new_grid, lines)
 
 	-- Update positions of snow
 	for row = 0, height do
