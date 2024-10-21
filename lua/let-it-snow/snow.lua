@@ -32,7 +32,7 @@ local function _make_grid(height, width)
 end
 
 local function _is_floating(buf, row, col, grid)
-	if row == vim.api.nvim_buf_line_count(buf) then
+	if row == vim.api.nvim_buf_line_count(buf) - 1 then
 		return false
 	end
 	if row + 1 < #grid then
