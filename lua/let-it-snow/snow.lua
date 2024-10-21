@@ -5,20 +5,20 @@ local SNOWPILE_MAX = 8
 local ns_id = vim.api.nvim_create_namespace("snow")
 local stop = true
 
-local function _clear_snow(buf)
+local function clear_snow(buf)
 	local marks = vim.api.nvim_buf_get_extmarks(buf, ns_id, 0, -1, {})
 	for _, mark in ipairs(marks) do
 		vim.api.nvim_buf_del_extmark(buf, ns_id, mark[1])
 	end
 end
 
-local function _end_hygge(buf)
+local function end_hygge(buf)
 	vim.api.nvim_buf_del_user_command(buf, end_command_str)
 
 	stop = true
 end
 
-local function _make_grid(height, width)
+local function make_grid(height, width)
 	local grid = {}
 
 	for i = 0, height do
@@ -31,7 +31,7 @@ local function _make_grid(height, width)
 	return grid
 end
 
-local function _is_floating(buf, row, col, grid)
+local function is_floating(buf, row, col, grid)
 	if row == vim.api.nvim_buf_line_count(buf) - 1 then
 		return false
 	end
@@ -47,7 +47,7 @@ local function _is_floating(buf, row, col, grid)
 	return true
 end
 
-local function _show_snowflake(buf, row, col)
+local function show_snowflake(buf, row, col)
 	vim.api.nvim_buf_set_extmark(buf, ns_id, row, 0, {
 		virt_text = { { "❄" } },
 		virt_text_win_col = col,
@@ -65,7 +65,7 @@ local size_to_snowpile = {
 	[8] = "\u{2588}",
 }
 
-local function _show_snowpile(buf, row, col, size)
+local function show_snowpile(buf, row, col, size)
 	assert(size < SNOWPILE_MAX, string.format("Exceeded max snowpile size (%d) at: %d, %d", size, buf, row, size))
 	local icon = size_to_snowpile[size]
 
@@ -75,13 +75,13 @@ local function _show_snowpile(buf, row, col, size)
 	})
 end
 
-local function _show_snow(buf, row, col, grid)
+local function show_snow(buf, row, col, grid)
 	local size = grid[row][col]
 
-	if size == 1 and _is_floating(buf, row, col, grid) then
-		_show_snowflake(buf, row, col)
+	if size == 1 and is_floating(buf, row, col, grid) then
+		show_snowflake(buf, row, col)
 	else
-		_show_snowpile(buf, row, col, size)
+		show_snowpile(buf, row, col, size)
 	end
 end
 
@@ -92,37 +92,37 @@ local function _show_snow_debug(buf, row, col, grid)
 	})
 end
 
-local function _show_grid(buf, grid)
+local function show_grid(buf, grid)
 	for row = 0, #grid do
 		for col = 0, #grid[row] do
 			if grid[row][col] == 0 then
 				goto continue
 			end
-			_show_snow(buf, row, col, grid)
+			show_snow(buf, row, col, grid)
 			::continue::
 		end
 	end
 end
 
-local function _inside_grid(row, col, grid)
+local function inside_grid(row, col, grid)
 	return row >= 0 and row < #grid and col >= 0 and col < #grid[row]
 end
 
-local function _obstructed(row, col, lines, grid)
-	assert(_inside_grid(row, col, grid), string.format("Obstruction check outside of grid at: %d, %d", row, col))
+local function obstructed(row, col, lines, grid)
+	assert(inside_grid(row, col, grid), string.format("Obstruction check outside of grid at: %d, %d", row, col))
 	return col < #lines[row] and lines[row][col] ~= " "
 end
 
-local function _spawn_snowflake(grid, lines)
+local function spawn_snowflake(grid, lines)
 	local x = nil
     -- `lines` is 1-based, so check if obstructed at line 1 (uppermost line)
-	while x == nil or _obstructed(1, x, lines, grid) do
+	while x == nil or obstructed(1, x, lines, grid) do
 		x = math.random(0, #grid[0] - 1)
 	end
 	grid[0][x] = grid[0][x] + 1
 end
 
-local function _update_snowflake(row, col, old_grid, new_grid, lines)
+local function update_snowflake(row, col, old_grid, new_grid, lines)
 	local below = nil
 	local below_a = nil
 	local below_b = nil
@@ -130,7 +130,7 @@ local function _update_snowflake(row, col, old_grid, new_grid, lines)
 	local below_d = nil
 
 	-- Check straight down
-	if _inside_grid(row + 1, col, new_grid) and not _obstructed(row + 1, col, lines, new_grid) then
+	if inside_grid(row + 1, col, new_grid) and not obstructed(row + 1, col, lines, new_grid) then
 		below = old_grid[row + 1][col]
 	end
 
@@ -141,32 +141,32 @@ local function _update_snowflake(row, col, old_grid, new_grid, lines)
 
 	-- Check 1 down 1 sideways
 	if
-		_inside_grid(row + 1, col + d, new_grid)
-		and not _obstructed(row + 1, col, lines, new_grid)
-		and not _obstructed(row + 1, col + d, lines, new_grid)
+		inside_grid(row + 1, col + d, new_grid)
+		and not obstructed(row + 1, col, lines, new_grid)
+		and not obstructed(row + 1, col + d, lines, new_grid)
 	then
 		below_a = old_grid[row + 1][col + d]
 	end
 	if
-		_inside_grid(row + 1, col - d, new_grid)
-		and not _obstructed(row + 1, col, lines, new_grid)
-		and not _obstructed(row + 1, col - d, lines, new_grid)
+		inside_grid(row + 1, col - d, new_grid)
+		and not obstructed(row + 1, col, lines, new_grid)
+		and not obstructed(row + 1, col - d, lines, new_grid)
 	then
 		below_b = old_grid[row + 1][col - d]
 	end
 
 	-- Check 1 down 2 sideways
 	if
-		_inside_grid(row + 1, col + 2 * d, new_grid)
-		and not _obstructed(row + 1, col, lines, new_grid)
-		and not _obstructed(row + 1, col + 2 * d, lines, new_grid)
+		inside_grid(row + 1, col + 2 * d, new_grid)
+		and not obstructed(row + 1, col, lines, new_grid)
+		and not obstructed(row + 1, col + 2 * d, lines, new_grid)
 	then
 		below_c = old_grid[row + 1][col + 2 * d]
 	end
 	if
-		_inside_grid(row + 1, col - 2 * d, new_grid)
-		and not _obstructed(row + 1, col, lines, new_grid)
-		and not _obstructed(row + 1, col - 2 * d, lines, new_grid)
+		inside_grid(row + 1, col - 2 * d, new_grid)
+		and not obstructed(row + 1, col, lines, new_grid)
+		and not obstructed(row + 1, col - 2 * d, lines, new_grid)
 	then
 		below_d = old_grid[row + 1][col - 2 * d]
 	end
@@ -198,22 +198,22 @@ local function _update_snowflake(row, col, old_grid, new_grid, lines)
 	end
 end
 
-local function _update_snowpile(row, col, old_grid, new_grid, lines)
+local function update_snowpile(row, col, old_grid, new_grid, lines)
 	local d = 1
 	if math.random() < 0.5 then
 		d = -1
 	end
 	if
-		_inside_grid(row, col + d, new_grid)
+		inside_grid(row, col + d, new_grid)
 		and old_grid[row][col + d] <= old_grid[row][col] - 3
-		and not _obstructed(row, col + d, lines, new_grid)
+		and not obstructed(row, col + d, lines, new_grid)
 	then
 		new_grid[row][col + d] = new_grid[row][col + d] + 1
 		new_grid[row][col] = new_grid[row][col] + old_grid[row][col] - 1
 	elseif
-		_inside_grid(row, col - d, new_grid)
+		inside_grid(row, col - d, new_grid)
 		and old_grid[row][col - d] <= old_grid[row][col] - 3
-		and not _obstructed(row, col - d, lines, new_grid)
+		and not obstructed(row, col - d, lines, new_grid)
 	then
 		new_grid[row][col - d] = new_grid[row][col - d] + 1
 		new_grid[row][col] = new_grid[row][col] + old_grid[row][col] - 1
@@ -222,14 +222,14 @@ local function _update_snowpile(row, col, old_grid, new_grid, lines)
 	end
 end
 
-local function _update_grid(win, buf, old_grid)
+local function update_grid(win, buf, old_grid)
 	local height = vim.api.nvim_buf_line_count(buf)
 	local width = vim.api.nvim_win_get_width(win)
 	local lines = vim.api.nvim_buf_get_lines(buf, 0, height, true)
 
-	local new_grid = _make_grid(height, width)
+	local new_grid = make_grid(height, width)
 
-	_spawn_snowflake(new_grid, lines)
+	spawn_snowflake(new_grid, lines)
 
 	-- Update positions of snow
 	for row = 0, height do
@@ -240,10 +240,10 @@ local function _update_grid(win, buf, old_grid)
 			if col >= #old_grid[row] or old_grid[row][col] == 0 then
 				goto continue_inner
 			end
-			if _is_floating(buf, row, col, old_grid) then
-				_update_snowflake(row, col, old_grid, new_grid, lines)
+			if is_floating(buf, row, col, old_grid) then
+				update_snowflake(row, col, old_grid, new_grid, lines)
 			else
-				_update_snowpile(row, col, old_grid, new_grid, lines)
+				update_snowpile(row, col, old_grid, new_grid, lines)
 			end
 			::continue_inner::
 		end
@@ -253,19 +253,19 @@ local function _update_grid(win, buf, old_grid)
 	return new_grid
 end
 
-local function _main_loop(win, buf, grid)
-	grid = _update_grid(win, buf, grid)
+local function main_loop(win, buf, grid)
+	grid = update_grid(win, buf, grid)
 
-	_clear_snow(buf)
+	clear_snow(buf)
 
-	_show_grid(buf, grid)
+	show_grid(buf, grid)
 
 	if not stop then
 		vim.defer_fn(function()
-			_main_loop(win, buf, grid)
+			main_loop(win, buf, grid)
 		end, 500)
 	else
-		_clear_snow(buf)
+		clear_snow(buf)
 	end
 end
 
@@ -275,16 +275,16 @@ M._let_it_snow = function()
 
 	local height = vim.api.nvim_buf_line_count(buf)
 	local width = vim.api.nvim_win_get_width(win)
-	local initial_grid = _make_grid(height, width)
+	local initial_grid = make_grid(height, width)
 
 	vim.api.nvim_buf_create_user_command(buf, end_command_str, function()
-		_end_hygge(buf)
+		end_hygge(buf)
 	end, {})
 
 	stop = false
 
 	vim.defer_fn(function()
-		_main_loop(win, buf, initial_grid)
+		main_loop(win, buf, initial_grid)
 	end, 500)
 end
 
