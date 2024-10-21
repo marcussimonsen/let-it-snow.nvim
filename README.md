@@ -1,4 +1,4 @@
-#  et-it-snow.nvim
+# let-it-snow.nvim
 
 A Neovim plugin written in Lua to bring winter "hygge" into your editor.
 
