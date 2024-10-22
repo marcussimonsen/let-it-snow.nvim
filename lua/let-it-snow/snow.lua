@@ -66,7 +66,7 @@ local size_to_snowpile = {
 }
 
 local function show_snowpile(buf, row, col, size)
-	assert(size < SNOWPILE_MAX, string.format("Exceeded max snowpile size (%d) at: %d, %d", size, buf, row, size))
+	assert(size <= SNOWPILE_MAX, string.format("Exceeded max snowpile size (%d) at in buf %s: %d, %d", size, buf, row, col))
 	local icon = size_to_snowpile[size]
 
 	vim.api.nvim_buf_set_extmark(buf, ns_id, row, 0, {
