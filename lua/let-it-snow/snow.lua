@@ -31,20 +31,20 @@ local function make_grid(height, width)
 	return grid
 end
 
-local function is_floating(buf, row, col, grid)
-	if row == vim.api.nvim_buf_line_count(buf) - 1 then
+local function inside_grid(row, col, grid)
+	return row >= 0 and row < #grid and col >= 0 and col < #grid[row]
+end
+
+local function obstructed(row, col, lines, grid)
+	-- `lines` is 1-based, so check char in lines at row + 1 (uppermost line)
+	return (col < #lines[row + 1] and lines[row + 1]:sub(col + 1, col + 1) ~= " ") or grid[row][col] == SNOWPILE_MAX
+end
+
+local function is_floating(row, col, grid, lines)
+	if row == #lines - 1 then
 		return false
 	end
-	if row + 1 < #grid then
-		if grid[row + 1][col] == SNOWPILE_MAX then
-			return false
-		end
-		local next_line = vim.fn.getbufoneline(buf, row + 2)
-		if col < #next_line and next_line[col] ~= " " then
-			return false
-		end
-	end
-	return true
+	return not obstructed(row + 1, col, lines, grid)
 end
 
 local function show_snowflake(buf, row, col)
@@ -75,48 +75,51 @@ local function show_snowpile(buf, row, col, size)
 	})
 end
 
-local function show_snow(buf, row, col, grid)
+local function show_snow(buf, row, col, grid, lines)
 	local size = grid[row][col]
 
-	if size == 1 and is_floating(buf, row, col, grid) then
+	if size == 1 and is_floating(row, col, grid, lines) then
 		show_snowflake(buf, row, col)
 	else
 		show_snowpile(buf, row, col, size)
 	end
 end
 
-local function _show_snow_debug(buf, row, col, grid)
+local function show_snow_debug(buf, row, col, grid)
 	vim.api.nvim_buf_set_extmark(buf, ns_id, row, 0, {
 		virt_text = { { tostring(grid[row][col]) } },
 		virt_text_win_col = col,
 	})
 end
 
-local function show_grid(buf, grid)
+local function show_debug_obstructed(buf, grid, lines)
+	for row = 0, #grid - 1 do
+		for col = 0, #grid[row] do
+			if obstructed(row, col, lines, grid) then
+				vim.api.nvim_buf_set_extmark(buf, ns_id, row, 0, {
+					virt_text = { { "\u{2588}" } },
+					virt_text_win_col = col,
+				})
+			end
+		end
+	end
+end
+
+local function show_grid(buf, grid, lines)
 	for row = 0, #grid do
 		for col = 0, #grid[row] do
 			if grid[row][col] == 0 then
 				goto continue
 			end
-			show_snow(buf, row, col, grid)
+			show_snow(buf, row, col, grid, lines)
 			::continue::
 		end
 	end
 end
 
-local function inside_grid(row, col, grid)
-	return row >= 0 and row < #grid and col >= 0 and col < #grid[row]
-end
-
-local function obstructed(row, col, lines, grid)
-	assert(inside_grid(row, col, grid), string.format("Obstruction check outside of grid at: %d, %d", row, col))
-	return col < #lines[row] and lines[row][col] ~= " "
-end
-
 local function spawn_snowflake(grid, lines)
 	local x = nil
-    -- `lines` is 1-based, so check if obstructed at line 1 (uppermost line)
-	while x == nil or obstructed(1, x, lines, grid) do
+	while x == nil or obstructed(0, x, lines, grid) do
 		x = math.random(0, #grid[0] - 1)
 	end
 	grid[0][x] = grid[0][x] + 1
@@ -222,10 +225,9 @@ local function update_snowpile(row, col, old_grid, new_grid, lines)
 	end
 end
 
-local function update_grid(win, buf, old_grid)
+local function update_grid(win, buf, old_grid, lines)
 	local height = vim.api.nvim_buf_line_count(buf)
 	local width = vim.api.nvim_win_get_width(win)
-	local lines = vim.api.nvim_buf_get_lines(buf, 0, height, true)
 
 	local new_grid = make_grid(height, width)
 
@@ -240,7 +242,7 @@ local function update_grid(win, buf, old_grid)
 			if col >= #old_grid[row] or old_grid[row][col] == 0 then
 				goto continue_inner
 			end
-			if is_floating(buf, row, col, old_grid) then
+			if is_floating(row, col, old_grid, lines) then
 				update_snowflake(row, col, old_grid, new_grid, lines)
 			else
 				update_snowpile(row, col, old_grid, new_grid, lines)
@@ -253,12 +255,26 @@ local function update_grid(win, buf, old_grid)
 	return new_grid
 end
 
+local function get_lines(buf)
+	local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, true)
+    local tabwidth = vim.o.tabstop
+
+    local tab_replacement = (" "):rep(tabwidth)
+
+    for row = 1, #lines do
+        lines[row] = lines[row]:gsub("\t", tab_replacement)
+    end
+
+    return lines
+end
+
 local function main_loop(win, buf, grid)
-	grid = update_grid(win, buf, grid)
+    local lines = get_lines(buf)
+	grid = update_grid(win, buf, grid, lines)
 
 	clear_snow(buf)
 
-	show_grid(buf, grid)
+	show_grid(buf, grid, lines)
 
 	if not stop then
 		vim.defer_fn(function()
@@ -285,7 +301,7 @@ M._let_it_snow = function()
 
 	vim.defer_fn(function()
 		main_loop(win, buf, initial_grid)
-	end, 500)
+	end, 0)
 end
 
 return M
