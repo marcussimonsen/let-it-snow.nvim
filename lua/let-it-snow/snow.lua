@@ -231,7 +231,7 @@ local function update_snowpile(row, col, old_grid, new_grid, lines)
 	then
 		new_grid[row][col - d] = new_grid[row][col - d] + 1
 		new_grid[row][col] = new_grid[row][col] + old_grid[row][col] - 1
-	else
+	elseif inside_grid(row, col, new_grid) and not obstructed(row, col, lines, new_grid) then
 		new_grid[row][col] = new_grid[row][col] + old_grid[row][col]
 	end
 end
