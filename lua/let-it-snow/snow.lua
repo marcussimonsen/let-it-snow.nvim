@@ -37,7 +37,9 @@ end
 
 local function obstructed(row, col, lines, grid)
 	-- `lines` is 1-based, so check char in lines at row + 1 (uppermost line)
-	return (col < #lines[row + 1] and lines[row + 1]:sub(col + 1, col + 1) ~= " ") or grid[row][col] == SNOWPILE_MAX
+	local char_obstructed = (col < #lines[row + 1] and lines[row + 1]:sub(col + 1, col + 1) ~= " ")
+	local snowpile_obstructed = grid[row][col] == SNOWPILE_MAX
+	return char_obstructed or snowpile_obstructed
 end
 
 local function is_floating(row, col, grid, lines)
