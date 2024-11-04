@@ -33,9 +33,13 @@ to *help bring you some "hygge" into your editor :)
 
 ## Inspiration:
 
-This plugin was inspired by the following amazing people:
+Credit where credit is due; This plugin was inspired by the following amazing
+people/projects:
 
 - [cellular-automaton.nvim](https://github.com/Eandrju/cellular-automaton.nvim)
   for bringing animations into Neovim.
 - [Coding Traing Challenge 180](https://www.youtube.com/watch?v=L4u7Zy_b868)
   for physics.
+- [treesj](https://github.com/Wansmer/treesj/tree/main) by
+  [Wansmer](https://github.com/Wansmer) for much of the project structure and
+  many helper functions.
