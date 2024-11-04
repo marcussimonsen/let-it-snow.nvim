@@ -43,7 +43,7 @@ local function obstructed(row, col, lines, grid)
 end
 
 local function is_floating(row, col, grid, lines)
-	if row == #lines - 1 then
+	if row >= #lines - 1 then
 		return false
 	end
 	return not obstructed(row + 1, col, lines, grid)
