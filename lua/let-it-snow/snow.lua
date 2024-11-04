@@ -131,85 +131,12 @@ local function spawn_snowflake(grid, lines)
 	grid[0][x] = grid[0][x] + 1
 end
 
-local function update_snowflake(row, col, old_grid, new_grid, lines)
-	-- OPTIMIZE: Can snowflake fall sideways?
-	local below = nil
-	local below_a = nil
-	local below_b = nil
-	local below_c = nil
-	local below_d = nil
-
-	-- Check straight down
-	if inside_grid(row + 1, col, new_grid) and not obstructed(row + 1, col, lines, new_grid) then
-		below = old_grid[row + 1][col]
-	end
-
-	local d = 1
-	if math.random() < 0.5 then
-		d = -1
-	end
-
-	-- TODO: Merge this with if's below due to redundancy
-
-	-- Check 1 down 1 sideways
-	if
-		inside_grid(row + 1, col + d, new_grid)
-		and not obstructed(row + 1, col, lines, new_grid)
-		and not obstructed(row + 1, col + d, lines, new_grid)
-	then
-		below_a = old_grid[row + 1][col + d]
-	end
-	if
-		inside_grid(row + 1, col - d, new_grid)
-		and not obstructed(row + 1, col, lines, new_grid)
-		and not obstructed(row + 1, col - d, lines, new_grid)
-	then
-		below_b = old_grid[row + 1][col - d]
-	end
-
-	-- Check 1 down 2 sideways
-	if
-		inside_grid(row + 1, col + 2 * d, new_grid)
-		and not obstructed(row + 1, col, lines, new_grid)
-		and not obstructed(row + 1, col + 2 * d, lines, new_grid)
-	then
-		below_c = old_grid[row + 1][col + 2 * d]
-	end
-	if
-		inside_grid(row + 1, col - 2 * d, new_grid)
-		and not obstructed(row + 1, col, lines, new_grid)
-		and not obstructed(row + 1, col - 2 * d, lines, new_grid)
-	then
-		below_d = old_grid[row + 1][col - 2 * d]
-	end
-
-	-- TODO: Merge this with if's above
-
-	-- Actually move snow (if possible)
-	local moved = false
-	-- Straight down
-	if below ~= nil and below < SNOWPILE_MAX then
-		new_grid[row + 1][col] = new_grid[row + 1][col] + 1
-		moved = true
-	elseif below_a ~= nil and below_a < SNOWPILE_MAX then
-		new_grid[row + 1][col + d] = new_grid[row + 1][col + d] + 1
-		moved = true
-	elseif below_b ~= nil and below_b < SNOWPILE_MAX then
-		new_grid[row + 1][col - d] = new_grid[row + 1][col - d] + 1
-		moved = true
-	elseif below_c ~= nil and below_c < SNOWPILE_MAX then
-		new_grid[row + 1][col + 2 * d] = new_grid[row + 1][col + 2 * d] + 1
-		moved = true
-	elseif below_d ~= nil and below_d < SNOWPILE_MAX then
-		new_grid[row + 1][col - 2 * d] = new_grid[row + 1][col - 2 * d] + 1
-		moved = true
-	else
-		new_grid[row][col] = new_grid[row][col] + old_grid[row][col]
-	end
-
-	if moved ~= nil and moved then
-		new_grid[row][col] = new_grid[row][col] + old_grid[row][col] - 1
-	end
+local function update_snowflake(row, col, old_grid, new_grid)
+    -- Snow always fall - by definition
+    -- Move 1 snow to cell below
+	new_grid[row + 1][col] = new_grid[row + 1][col] + 1
+    -- Keep rest of snow
+	new_grid[row][col] = new_grid[row][col] + old_grid[row][col] - 1
 end
 
 local function update_snowpile(row, col, old_grid, new_grid, lines)
@@ -252,7 +179,7 @@ local function update_grid(win, buf, old_grid, lines)
 				goto continue_inner
 			end
 			if is_floating(row, col, old_grid, lines) then
-				update_snowflake(row, col, old_grid, new_grid, lines)
+				update_snowflake(row, col, old_grid, new_grid)
 			else
 				update_snowpile(row, col, old_grid, new_grid, lines)
 			end
