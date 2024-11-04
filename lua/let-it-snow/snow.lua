@@ -242,8 +242,6 @@ local function update_grid(win, buf, old_grid, lines)
 
 	local new_grid = make_grid(height, width)
 
-	spawn_snowflake(new_grid, lines)
-
 	-- Update positions of snow
 	for row = 0, height do
 		if row >= #old_grid then
@@ -262,6 +260,8 @@ local function update_grid(win, buf, old_grid, lines)
 		end
 		::continue_outer::
 	end
+
+	spawn_snowflake(new_grid, lines)
 
 	return new_grid
 end
