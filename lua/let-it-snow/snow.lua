@@ -268,19 +268,19 @@ end
 
 local function get_lines(buf)
 	local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, true)
-    local tabwidth = vim.o.tabstop
+	local tabwidth = vim.o.tabstop
 
-    local tab_replacement = (" "):rep(tabwidth)
+	local tab_replacement = (" "):rep(tabwidth)
 
-    for row = 1, #lines do
-        lines[row] = lines[row]:gsub("\t", tab_replacement)
-    end
+	for row = 1, #lines do
+		lines[row] = lines[row]:gsub("\t", tab_replacement)
+	end
 
-    return lines
+	return lines
 end
 
 local function main_loop(win, buf, grid)
-    local lines = get_lines(buf)
+	local lines = get_lines(buf)
 	grid = update_grid(win, buf, grid, lines)
 
 	clear_snow(buf)
