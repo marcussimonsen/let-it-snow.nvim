@@ -141,10 +141,10 @@ local function spawn_snowflake(grid, lines)
 end
 
 local function update_snowflake(row, col, old_grid, new_grid)
-    -- Snow always fall - by definition
-    -- Move 1 snow to cell below
+	-- Snow always fall - by definition
+	-- Move 1 snow to cell below
 	new_grid[row + 1][col] = new_grid[row + 1][col] + 1
-    -- Keep rest of snow
+	-- Keep rest of snow
 	new_grid[row][col] = new_grid[row][col] + old_grid[row][col] - 1
 end
 
