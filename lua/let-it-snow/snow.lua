@@ -2,6 +2,7 @@ local M = {}
 
 local end_command_str = "End"
 local SNOWPILE_MAX = 8
+local MAX_SPAWN_ATTEMPTS = 500
 local ns_id = vim.api.nvim_create_namespace("snow")
 local stop = true
 
@@ -124,9 +125,17 @@ end
 
 local function spawn_snowflake(grid, lines)
 	local x = nil
-	-- WARN: This could run forever if top line is fully blocked
+	local attempts = 0
 	while x == nil or obstructed(0, x, lines, grid) do
+		if attempts >= MAX_SPAWN_ATTEMPTS then
+			vim.notify(
+				("Warning: Exceeded %d attempts in spawning a snowflake!\nStopping..."):format(MAX_SPAWN_ATTEMPTS),
+				vim.log.levels.WARN
+			)
+			return
+		end
 		x = math.random(0, #grid[0] - 1)
+		attempts = attempts + 1
 	end
 	grid[0][x] = grid[0][x] + 1
 end
