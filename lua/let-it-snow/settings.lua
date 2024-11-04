@@ -1,5 +1,7 @@
 local M = {}
 
+-- TODO: Add default settings
+
 local commands = {
 	{
 		name = "LetItSnow",

@@ -119,6 +119,7 @@ end
 
 local function spawn_snowflake(grid, lines)
 	local x = nil
+	-- WARN: This could run forever if top line is fully blocked
 	while x == nil or obstructed(0, x, lines, grid) do
 		x = math.random(0, #grid[0] - 1)
 	end
@@ -126,6 +127,7 @@ local function spawn_snowflake(grid, lines)
 end
 
 local function update_snowflake(row, col, old_grid, new_grid, lines)
+	-- OPTIMIZE: Can snowflake fall sideways?
 	local below = nil
 	local below_a = nil
 	local below_b = nil
@@ -141,6 +143,8 @@ local function update_snowflake(row, col, old_grid, new_grid, lines)
 	if math.random() < 0.5 then
 		d = -1
 	end
+
+	-- TODO: Merge this with if's below due to redundancy
 
 	-- Check 1 down 1 sideways
 	if
@@ -173,6 +177,8 @@ local function update_snowflake(row, col, old_grid, new_grid, lines)
 	then
 		below_d = old_grid[row + 1][col - 2 * d]
 	end
+
+	-- TODO: Merge this with if's above
 
 	-- Actually move snow (if possible)
 	local moved = false
@@ -276,6 +282,7 @@ local function main_loop(win, buf, grid)
 
 	show_grid(buf, grid, lines)
 
+	-- TODO: Delay with desired - time_to_update_grid
 	if not stop then
 		vim.defer_fn(function()
 			main_loop(win, buf, grid)
