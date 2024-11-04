@@ -208,7 +208,7 @@ local function update_snowflake(row, col, old_grid, new_grid, lines)
 	end
 
 	if moved ~= nil and moved then
-		new_grid[row][col] = old_grid[row][col] - 1
+		new_grid[row][col] = new_grid[row][col] + old_grid[row][col] - 1
 	end
 end
 
