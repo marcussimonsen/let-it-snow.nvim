@@ -245,7 +245,7 @@ local function update_grid(win, buf, old_grid, lines)
 	-- Update positions of snow
 	for row = 0, height do
 		if row >= #old_grid then
-			goto continue_outer
+			break
 		end
 		for col = 0, width do
 			if col >= #old_grid[row] or old_grid[row][col] == 0 then
@@ -258,7 +258,6 @@ local function update_grid(win, buf, old_grid, lines)
 			end
 			::continue_inner::
 		end
-		::continue_outer::
 	end
 
 	spawn_snowflake(new_grid, lines)
