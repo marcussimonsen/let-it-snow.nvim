@@ -168,6 +168,7 @@ local function update_snowpile(row, col, old_grid, new_grid, lines)
 	then
 		new_grid[row + 1][col - d] = new_grid[row + 1][col - d] + 1
 		new_grid[row][col] = new_grid[row][col] + old_grid[row][col] - 1
+		-- FIX: Don't fall sideways when in pile and can't fall diagonal
 	elseif -- Fall 1 to the side
 		inside_grid(row, col + d, new_grid)
 		and old_grid[row][col + d] <= old_grid[row][col] - 3
