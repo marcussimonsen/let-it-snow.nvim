@@ -152,14 +152,30 @@ local function update_snowpile(row, col, old_grid, new_grid, lines)
 	if math.random() < 0.5 then
 		d = -1
 	end
-	if
+	if -- Fall 1 down 1 to the side
+		inside_grid(row + 1, col + d, new_grid)
+		and old_grid[row + 1][col + d] <= old_grid[row][col] - 2
+		and not obstructed(row, col + d, lines, new_grid)
+		and not obstructed(row + 1, col + d, lines, new_grid)
+	then
+		new_grid[row + 1][col + d] = new_grid[row + 1][col + d] + 1
+		new_grid[row][col] = new_grid[row][col] + old_grid[row][col] - 1
+	elseif -- Other side
+		inside_grid(row + 1, col - d, new_grid)
+		and old_grid[row + 1][col - d] <= old_grid[row][col] - 2
+		and not obstructed(row, col - d, lines, new_grid)
+		and not obstructed(row + 1, col - d, lines, new_grid)
+	then
+		new_grid[row + 1][col - d] = new_grid[row + 1][col - d] + 1
+		new_grid[row][col] = new_grid[row][col] + old_grid[row][col] - 1
+	elseif -- Fall 1 to the side
 		inside_grid(row, col + d, new_grid)
 		and old_grid[row][col + d] <= old_grid[row][col] - 3
 		and not obstructed(row, col + d, lines, new_grid)
 	then
 		new_grid[row][col + d] = new_grid[row][col + d] + 1
 		new_grid[row][col] = new_grid[row][col] + old_grid[row][col] - 1
-	elseif
+	elseif -- Other side
 		inside_grid(row, col - d, new_grid)
 		and old_grid[row][col - d] <= old_grid[row][col] - 3
 		and not obstructed(row, col - d, lines, new_grid)
