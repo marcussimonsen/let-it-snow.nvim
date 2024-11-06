@@ -1,10 +1,20 @@
+local settings = require("let-it-snow.settings")
+
 local M = {}
 
-local end_command_str = "End"
-local SNOWPILE_MAX = 8
-local MAX_SPAWN_ATTEMPTS = 500
-local ns_id = vim.api.nvim_create_namespace("snow")
-local stop = true
+local desired_delay = settings.settings.delay
+local snowpile_max_size = #settings.settings.snowpile_chars
+local max_spawn_attempts = settings.settings.max_spawn_attempts
+
+local snowflake_char = settings.settings.snowflake_char
+local snowpile_chars = settings.settings.snowpile_chars
+local ns_id = vim.api.nvim_create_namespace(settings.settings.namespace)
+local hl_group_snowflakes = settings.settings.highlight_group_name_snowflake
+local hl_group_snowpiles = settings.settings.highlight_group_name_snowpile
+
+-- TODO: This doesn't seem to belong here
+local end_command_str = "EndHygge"
+local running = false
 
 local function clear_snow(buf)
 	local marks = vim.api.nvim_buf_get_extmarks(buf, ns_id, 0, -1, {})
@@ -16,7 +26,7 @@ end
 local function end_hygge(buf)
 	vim.api.nvim_buf_del_user_command(buf, end_command_str)
 
-	stop = true
+	running = false
 end
 
 local function make_grid(height, width)
@@ -39,7 +49,7 @@ end
 local function obstructed(row, col, lines, grid)
 	-- `lines` is 1-based, so check char in lines at row + 1 (uppermost line)
 	local char_obstructed = (col < #lines[row + 1] and lines[row + 1]:sub(col + 1, col + 1) ~= " ")
-	local snowpile_obstructed = grid[row][col] == SNOWPILE_MAX
+	local snowpile_obstructed = grid[row][col] == snowpile_max_size
 	return char_obstructed or snowpile_obstructed
 end
 
@@ -52,31 +62,20 @@ end
 
 local function show_snowflake(buf, row, col)
 	vim.api.nvim_buf_set_extmark(buf, ns_id, row, 0, {
-		virt_text = { { "❄" } },
+		virt_text = { { snowflake_char, hl_group_snowflakes } },
 		virt_text_win_col = col,
 	})
 end
 
-local size_to_snowpile = {
-	[1] = "\u{2581}",
-	[2] = "\u{2582}",
-	[3] = "\u{2583}",
-	[4] = "\u{2584}",
-	[5] = "\u{2585}",
-	[6] = "\u{2586}",
-	[7] = "\u{2587}",
-	[8] = "\u{2588}",
-}
-
 local function show_snowpile(buf, row, col, size)
 	assert(
-		size <= SNOWPILE_MAX,
+		size <= snowpile_max_size,
 		string.format("Exceeded max snowpile size (%d) at in buf %s: %d, %d", size, buf, row, col)
 	)
-	local icon = size_to_snowpile[size]
+	local icon = snowpile_chars[size]
 
 	vim.api.nvim_buf_set_extmark(buf, ns_id, row, 0, {
-		virt_text = { { icon } },
+		virt_text = { { icon, hl_group_snowpiles } },
 		virt_text_win_col = col,
 	})
 end
@@ -127,9 +126,9 @@ local function spawn_snowflake(grid, lines)
 	local x = nil
 	local attempts = 0
 	while x == nil or obstructed(0, x, lines, grid) do
-		if attempts >= MAX_SPAWN_ATTEMPTS then
+		if attempts >= max_spawn_attempts then
 			vim.notify(
-				("Warning: Exceeded %d attempts in spawning a snowflake!\nStopping..."):format(MAX_SPAWN_ATTEMPTS),
+				("Warning: Exceeded %d attempts in spawning a snowflake!\nStopping..."):format(max_spawn_attempts),
 				vim.log.levels.WARN
 			)
 			return
@@ -223,10 +222,10 @@ local function main_loop(win, buf, grid)
 	show_grid(buf, grid, lines)
 
 	-- TODO: Delay with desired - time_to_update_grid
-	if not stop then
+	if running then
 		vim.defer_fn(function()
 			main_loop(win, buf, grid)
-		end, 500)
+		end, desired_delay)
 	else
 		clear_snow(buf)
 	end
@@ -244,7 +243,7 @@ M._let_it_snow = function()
 		end_hygge(buf)
 	end, {})
 
-	stop = false
+	running = true
 
 	vim.defer_fn(function()
 		main_loop(win, buf, initial_grid)
