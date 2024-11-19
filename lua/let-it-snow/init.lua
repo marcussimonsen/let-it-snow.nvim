@@ -5,9 +5,9 @@ local M = {}
 
 M.setup = function(opts)
 	settings._update_settings(opts)
-    if settings.settings.create_highlight_groups then
-        settings._create_hl_groups()
-    end
+	if settings.settings.create_highlight_groups then
+		settings._create_hl_groups()
+	end
 	settings._create_commands()
 end
 
