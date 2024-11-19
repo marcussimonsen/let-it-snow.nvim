@@ -12,6 +12,7 @@ M.setup = function(opts)
 end
 
 M.let_it_snow = function()
+    -- TODO: Ensure command cannot be run while already running
 	snow._let_it_snow()
 end
 
