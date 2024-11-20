@@ -1,13 +1,13 @@
-*let-it-snow.nvim.txt*      For NVIM v0.8.0      Last change: 2024 November 19
+*let-it-snow.nvim.txt*      For NVIM v0.8.0      Last change: 2024 November 20
 
 ==============================================================================
 Table of Contents                         *let-it-snow.nvim-table-of-contents*
 
 1. let-it-snow.nvim                        |let-it-snow.nvim-let-it-snow.nvim|
-  - But why?                      |let-it-snow.nvim-let-it-snow.nvim-but-why?|
+  - But why                        |let-it-snow.nvim-let-it-snow.nvim-but-why|
   - Installation              |let-it-snow.nvim-let-it-snow.nvim-installation|
   - How to run                  |let-it-snow.nvim-let-it-snow.nvim-how-to-run|
-  - Inspiration:              |let-it-snow.nvim-let-it-snow.nvim-inspiration:|
+  - Inspiration                |let-it-snow.nvim-let-it-snow.nvim-inspiration|
 
 ==============================================================================
 1. let-it-snow.nvim                        *let-it-snow.nvim-let-it-snow.nvim*
@@ -15,7 +15,7 @@ Table of Contents                         *let-it-snow.nvim-table-of-contents*
 A Neovim plugin written in Lua to bring winter "hygge" into your editor.
 
 
-BUT WHY?                          *let-it-snow.nvim-let-it-snow.nvim-but-why?*
+BUT WHY                            *let-it-snow.nvim-let-it-snow.nvim-but-why*
 
 Image this: It is winter. You are sitting in the evening by the fireplace and
 candlelight coding away. But suddenly you get stuck on a difficult problem.
@@ -46,7 +46,7 @@ piled up too much `EndHygge` will be available to save your code from being
 burried in the snow.
 
 
-INSPIRATION:                  *let-it-snow.nvim-let-it-snow.nvim-inspiration:*
+INSPIRATION                    *let-it-snow.nvim-let-it-snow.nvim-inspiration*
 
 Credit where credit is due; This plugin was inspired by the following amazing
 people/projects:
