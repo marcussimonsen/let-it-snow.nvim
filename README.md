@@ -4,7 +4,7 @@ A Neovim plugin written in Lua to bring winter "hygge" into your editor.
 
 <!-- TODO: Add video/gif of example -->
 
-## But why?
+## But why
 
 Image this:
 It is winter.
@@ -35,7 +35,7 @@ to *help bring you some "hygge" into your editor :) Oh and when the snow has
 piled up too much `EndHygge` will be available to save your code from being
 burried in the snow.
 
-## Inspiration:
+## Inspiration
 
 Credit where credit is due; This plugin was inspired by the following amazing
 people/projects:
