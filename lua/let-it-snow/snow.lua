@@ -235,18 +235,20 @@ local function get_lines(buf)
 end
 
 local function main_loop(win, buf, grid)
+	local start = os.clock() * 1000
 	local lines = get_lines(buf)
-	grid = update_grid(win, buf, grid, lines)
 
 	clear_snow(buf)
-
 	show_grid(buf, grid, lines)
 
-	-- TODO: Delay with desired - time_to_update_grid
+	grid = update_grid(win, buf, grid, lines)
+
+	local wait_time = math.max(0, settings.settings.delay - (os.clock() * 1000 - start))
+
 	if M.running[buf] then
 		vim.defer_fn(function()
 			main_loop(win, buf, grid)
-		end, settings.settings.delay)
+		end, wait_time)
 	else
 		clear_snow(buf)
 	end
