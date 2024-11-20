@@ -17,7 +17,7 @@ A Neovim plugin written in Lua to bring winter "hygge" into your editor.
 
 BUT WHY                            *let-it-snow.nvim-let-it-snow.nvim-but-why*
 
-Image this: It is winter. You are sitting in the evening by the fireplace and
+Imagine this: It is winter. You are sitting in the evening by the fireplace and
 candlelight coding away. But suddenly you get stuck on a difficult problem.
 While sitting there and wondering how you will ever solve this problem, your
 code is just sitting there, staring you in the face. Wouldn’t it be nice if
