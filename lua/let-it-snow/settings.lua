@@ -4,7 +4,7 @@ local DEFAULT_SETTINGS = {
 	---@type integer Delay between updates
 	delay = 500,
 	---@type string Single character used to represent snowflakes
-	snowflake_char = "❄",
+	snowflake_char = "\u{2744}",
 	---@type string[] Array of single character used to represent snow (in order of least to most)
 	snowpile_chars = {
 		[1] = "\u{2581}",
