@@ -6,7 +6,8 @@ local ns_id = vim.api.nvim_create_namespace(settings.settings.namespace)
 
 -- TODO: This doesn't seem to belong here
 local end_command_str = "EndHygge"
-local running = false
+
+M.running = {}
 
 local function clear_snow(buf)
 	local marks = vim.api.nvim_buf_get_extmarks(buf, ns_id, 0, -1, {})
@@ -15,10 +16,19 @@ local function clear_snow(buf)
 	end
 end
 
-local function end_hygge(buf)
-	vim.api.nvim_buf_del_user_command(buf, end_command_str)
+local function table_empty(t)
+	for _, _ in pairs(t) do
+		return false
+	end
+	return true
+end
 
-	running = false
+local function end_hygge(buf)
+	M.running[buf] = nil
+
+	if table_empty(M.running) then
+		vim.api.nvim_buf_del_user_command(buf, end_command_str)
+	end
 end
 
 local function make_grid(height, width)
@@ -233,7 +243,7 @@ local function main_loop(win, buf, grid)
 	show_grid(buf, grid, lines)
 
 	-- TODO: Delay with desired - time_to_update_grid
-	if running then
+	if M.running[buf] then
 		vim.defer_fn(function()
 			main_loop(win, buf, grid)
 		end, settings.settings.delay)
@@ -254,7 +264,7 @@ M._let_it_snow = function()
 		end_hygge(buf)
 	end, {})
 
-	running = true
+	M.running[buf] = true
 
 	vim.defer_fn(function()
 		main_loop(win, buf, initial_grid)
