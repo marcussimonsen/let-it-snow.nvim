@@ -6,7 +6,7 @@ A Neovim plugin written in Lua to bring winter "hygge" into your editor.
 
 ## But why
 
-Image this:
+Imagine this:
 It is winter.
 You are sitting in the evening by the fireplace and candlelight coding away.
 But suddenly you get stuck on a difficult problem.
