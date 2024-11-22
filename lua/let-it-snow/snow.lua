@@ -124,10 +124,10 @@ local function show_grid(buf, grid, lines)
 	end
 end
 
-local function spawn_snowflake(grid, lines)
+local function spawn_snowflake_on_line(row, grid, lines)
 	local x = nil
 	local attempts = 0
-	while x == nil or obstructed(0, x, lines, grid) do
+	while x == nil or obstructed(row, x, lines, grid) do
 		if attempts >= settings.settings.max_spawn_attempts then
 			vim.notify(
 				("Warning: Exceeded %d attempts in spawning a snowflake!\nStopping..."):format(
@@ -140,7 +140,11 @@ local function spawn_snowflake(grid, lines)
 		x = math.random(0, #grid[0] - 1)
 		attempts = attempts + 1
 	end
-	grid[0][x] = grid[0][x] + 1
+	grid[row][x] = grid[row][x] + 1
+end
+
+local function spawn_snowflake(grid, lines)
+	spawn_snowflake_on_line(0, grid, lines)
 end
 
 local function update_snowflake(row, col, old_grid, new_grid)
@@ -261,6 +265,12 @@ M._let_it_snow = function()
 	local height = vim.api.nvim_buf_line_count(buf)
 	local width = vim.api.nvim_win_get_width(win)
 	local initial_grid = make_grid(height, width)
+	local lines = get_lines(buf)
+
+	-- Fill initial_grid with snow
+	for row = 0, height - 1 do
+		spawn_snowflake_on_line(row, initial_grid, lines)
+	end
 
 	vim.api.nvim_buf_create_user_command(buf, end_command_str, function()
 		end_hygge(buf)
