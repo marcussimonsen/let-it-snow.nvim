@@ -2,7 +2,7 @@
 
 A Neovim plugin written in Lua to bring winter "hygge" into your editor.
 
-![Demo](.github/assets/demo.mp4)
+![Demo](.github/assets/demo.gif)
 
 ## But why
 
