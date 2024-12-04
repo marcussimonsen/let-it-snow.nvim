@@ -14,10 +14,10 @@ end
 M.let_it_snow = function()
 	local buf = vim.api.nvim_get_current_buf()
 	if snow.running[buf] then
-		vim.notify(("Already snowing in buffer %d"):format(buf), vim.log.levels.WARN)
-		return
+        snow.end_hygge(buf)
+    else
+        snow._let_it_snow()
 	end
-	snow._let_it_snow()
 end
 
 return M

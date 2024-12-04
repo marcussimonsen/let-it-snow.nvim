@@ -24,6 +24,7 @@ The only function available in `let-it-snow.nvim` is `LetItSnow` which is meant
 to *help bring you some "hygge" into your editor :) Oh and when the snow has
 piled up too much `EndHygge` will be available to save your code from being
 burried in the snow.
+Alternatively, just call `LetItSnow` again in the same buffer.
 
 ## Installation
 

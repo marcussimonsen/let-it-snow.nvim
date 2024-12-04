@@ -23,7 +23,7 @@ local function table_empty(t)
 	return true
 end
 
-local function end_hygge(buf)
+M.end_hygge = function(buf)
 	M.running[buf] = nil
 
 	if table_empty(M.running) then
@@ -275,7 +275,7 @@ M._let_it_snow = function()
 	end
 
 	vim.api.nvim_buf_create_user_command(buf, end_command_str, function()
-		end_hygge(buf)
+		M.end_hygge(buf)
 	end, {})
 
 	M.running[buf] = true
