@@ -113,7 +113,9 @@ local function show_debug_obstructed(buf, grid, lines)
 end
 
 local function show_grid(buf, grid, lines)
-	for row = 0, #grid do
+    local height = math.min(#grid, #lines)
+
+	for row = 0, height do
 		for col = 0, #grid[row] do
 			if grid[row][col] == 0 then
 				goto continue
