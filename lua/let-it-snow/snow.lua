@@ -198,14 +198,10 @@ local function update_snowpile(row, col, old_grid, new_grid, lines)
 	end
 end
 
-local function update_grid(win, buf, old_grid, lines)
+local function update_grid(buf, old_grid, lines)
+    win = vim.api.nvim_get_current_win()
 	local height = vim.api.nvim_buf_line_count(buf)
-	local width, err = pcall(vim.api.nvim_win_get_width(win))
-
-    if err then
-        win = vim.api.nvim_get_current_win()
-        width = vim.api.nvim_win_get_width(win)
-    end
+	local width, err = vim.api.nvim_win_get_width(win)
 
 	local new_grid = make_grid(height, width)
 
@@ -252,7 +248,7 @@ local function main_loop(win, buf, grid)
 	clear_snow(buf)
 	show_grid(buf, grid, lines)
 
-	grid = update_grid(win, buf, grid, lines)
+	grid = update_grid(buf, grid, lines)
 
 	local wait_time = math.max(0, settings.settings.delay - (os.clock() * 1000 - start))
 
