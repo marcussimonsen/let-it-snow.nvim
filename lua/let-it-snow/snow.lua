@@ -200,7 +200,12 @@ end
 
 local function update_grid(win, buf, old_grid, lines)
 	local height = vim.api.nvim_buf_line_count(buf)
-	local width = vim.api.nvim_win_get_width(win)
+	local width, err = pcall(vim.api.nvim_win_get_width(win))
+
+    if err then
+        win = vim.api.nvim_get_current_win()
+        width = vim.api.nvim_win_get_width(win)
+    end
 
 	local new_grid = make_grid(height, width)
 
