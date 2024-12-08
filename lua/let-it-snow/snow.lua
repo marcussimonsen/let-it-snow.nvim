@@ -198,7 +198,8 @@ local function update_snowpile(row, col, old_grid, new_grid, lines)
 	end
 end
 
-local function update_grid(win, buf, old_grid, lines)
+local function update_grid(buf, old_grid, lines)
+    local win = vim.api.nvim_get_current_win()
 	local height = vim.api.nvim_buf_line_count(buf)
 	local width = vim.api.nvim_win_get_width(win)
 
@@ -240,20 +241,20 @@ local function get_lines(buf)
 	return lines
 end
 
-local function main_loop(win, buf, grid)
+local function main_loop(buf, grid)
 	local start = os.clock() * 1000
 	local lines = get_lines(buf)
 
 	clear_snow(buf)
 	show_grid(buf, grid, lines)
 
-	grid = update_grid(win, buf, grid, lines)
+	grid = update_grid(buf, grid, lines)
 
 	local wait_time = math.max(0, settings.settings.delay - (os.clock() * 1000 - start))
 
 	if M.running[buf] then
 		vim.defer_fn(function()
-			main_loop(win, buf, grid)
+			main_loop(buf, grid)
 		end, wait_time)
 	else
 		clear_snow(buf)
@@ -281,7 +282,7 @@ M._let_it_snow = function()
 	M.running[buf] = true
 
 	vim.defer_fn(function()
-		main_loop(win, buf, initial_grid)
+		main_loop(buf, initial_grid)
 	end, 0)
 end
 
