@@ -14,7 +14,7 @@ end
 M.let_it_snow = function()
 	local buf = vim.api.nvim_get_current_buf()
 	if snow.running[buf] then
-		snow.stop_snow(buf)
+		snow._stop_snow(buf)
 	else
 		snow._let_it_snow()
 	end
