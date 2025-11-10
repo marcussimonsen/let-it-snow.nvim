@@ -13,6 +13,23 @@ local function clear_snow(buf)
 	end
 end
 
+local function table_empty(t)
+	for _, _ in pairs(t) do
+		return false
+	end
+	return true
+end
+
+M.end_hygge = function(buf)
+	M.running[buf] = nil
+
+	if table_empty(M.running) then
+		pcall(function()
+			vim.api.nvim_buf_del_user_command(buf, end_command_str)
+		end)
+	end
+end
+
 local function make_grid(height, width)
 	local grid = {}
 
@@ -180,7 +197,8 @@ local function update_snowpile(row, col, old_grid, new_grid, lines)
 	end
 end
 
-local function update_grid(win, buf, old_grid, lines)
+local function update_grid(buf, old_grid, lines)
+    local win = vim.api.nvim_get_current_win()
 	local height = vim.api.nvim_buf_line_count(buf)
 	local width = vim.api.nvim_win_get_width(win)
 
@@ -222,20 +240,27 @@ local function get_lines(buf)
 	return lines
 end
 
-local function main_loop(win, buf, grid)
+local function main_loop(buf, grid)
 	local start = os.clock() * 1000
 	local lines = get_lines(buf)
 
 	clear_snow(buf)
 	show_grid(buf, grid, lines)
 
-	grid = update_grid(win, buf, grid, lines)
+	local status, result = pcall(function()
+		return update_grid(buf, grid, lines)
+	end)
+
+	if not status then
+		M.end_hygge(buf)
+		return
+	end
 
 	local wait_time = math.max(0, settings.settings.delay - (os.clock() * 1000 - start))
 
 	if M.running[buf] then
 		vim.defer_fn(function()
-			main_loop(win, buf, grid)
+			main_loop(buf, result)
 		end, wait_time)
 	else
 		clear_snow(buf)
@@ -249,7 +274,7 @@ M._let_it_snow = function()
 	local height = vim.api.nvim_buf_line_count(buf)
 	local width = vim.api.nvim_win_get_width(win)
 	local initial_grid = make_grid(height, width)
-	local lines = get_lines(buf)
+	local lines = get_lines(buef)
 
 	-- Fill initial_grid with snow
 	for row = 0, height - 1 do
@@ -259,7 +284,7 @@ M._let_it_snow = function()
 	M.running[buf] = true
 
 	vim.defer_fn(function()
-		main_loop(win, buf, initial_grid)
+		main_loop(buf, initial_grid)
 	end, 0)
 end
 
