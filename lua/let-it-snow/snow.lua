@@ -27,7 +27,9 @@ M.end_hygge = function(buf)
 	M.running[buf] = nil
 
 	if table_empty(M.running) then
-		vim.api.nvim_buf_del_user_command(buf, end_command_str)
+		pcall(function()
+			vim.api.nvim_buf_del_user_command(buf, end_command_str)
+		end)
 	end
 end
 
@@ -248,13 +250,23 @@ local function main_loop(buf, grid)
 	clear_snow(buf)
 	show_grid(buf, grid, lines)
 
-	grid = update_grid(buf, grid, lines)
+	local status, result = pcall(function()
+		return update_grid(buf, grid, lines)
+	end)
+
+	print(result)
+
+	if not status then
+		print("Failed updating grid")
+		M.end_hygge(buf)
+		return
+	end
 
 	local wait_time = math.max(0, settings.settings.delay - (os.clock() * 1000 - start))
 
 	if M.running[buf] then
 		vim.defer_fn(function()
-			main_loop(buf, grid)
+			main_loop(buf, result)
 		end, wait_time)
 	else
 		clear_snow(buf)
