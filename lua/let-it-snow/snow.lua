@@ -261,7 +261,7 @@ M._let_it_snow = function()
 	local height = vim.api.nvim_buf_line_count(buf)
 	local width = vim.api.nvim_win_get_width(win)
 	local initial_grid = make_grid(height, width)
-	local lines = get_lines(buef)
+	local lines = get_lines(buf)
 
 	-- Fill initial_grid with snow
 	for row = 0, height - 1 do
