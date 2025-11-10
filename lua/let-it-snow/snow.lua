@@ -13,21 +13,8 @@ local function clear_snow(buf)
 	end
 end
 
-local function table_empty(t)
-	for _, _ in pairs(t) do
-		return false
-	end
-	return true
-end
-
 M.end_hygge = function(buf)
 	M.running[buf] = nil
-
-	if table_empty(M.running) then
-		pcall(function()
-			vim.api.nvim_buf_del_user_command(buf, end_command_str)
-		end)
-	end
 end
 
 local function make_grid(height, width)
