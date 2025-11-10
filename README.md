@@ -20,11 +20,14 @@ editor, bringing some fluffyness into your code.
 
 ## How to run
 
-The only function available in `let-it-snow.nvim` is `LetItSnow` which is meant
-to *help bring you some "hygge" into your editor :) Oh and when the snow has
-piled up too much `EndHygge` will be available to save your code from being
+The main function available in `let-it-snow.nvim` is `LetItSnow` which is meant
+to help bring you some "hygge" into your editor :) Oh and when the snow has
+piled up too much `LetItSnowStop` will be available to save your code from being
 burried in the snow.
 Alternatively, just call `LetItSnow` again in the same buffer.
+`LetItSnowStopAll` stops the snowing in all buffers at once.
+
+See [API section](##api) for functions available throught the API.
 
 ## Installation
 
@@ -70,6 +73,24 @@ function to overwrite settings.
 	highlight_group_name_snowpile = "snowpile",
 }
 ```
+
+## API
+
+- `setup`:
+  Sets up everything the plugin needs.
+  This should be called once when the plugin is loaded.
+  Takes a table containing the configuration settings.
+- `let_it_snow`:
+  Starts snowing in the current buffer.
+- `stop_snow`:
+  Stops snowing in the current buffer.
+- `stop_snow_all`:
+  Stops snowing in **all** buffers.
+- `is_running`:
+  Returns true or false depending on if it is snowing in the current buffer.
+- `is_running_in_buf`:
+  Takes a buffer handle as input and returns true or false depending on if it is
+  snowing in the given buffer.
 
 ## Inspiration
 

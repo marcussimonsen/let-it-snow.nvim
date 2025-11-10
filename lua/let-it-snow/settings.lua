@@ -36,10 +36,20 @@ local COMMANDS = {
 		desc = "Let It Snow",
 		func = "let_it_snow",
 	},
+	{
+		name = "LetItSnowStop",
+		desc = "Stop Snow",
+		func = "stop_snow",
+	},
+	{
+		name = "LetItSnowStopAll",
+		desc = "Stop snow in all buffers",
+		func = "stop_snow_all",
+	},
 }
 
 M._create_commands = function()
-	local let_it_snow = require("let-it-snow")
+	local let_it_snow = require("let-it-snow.init")
 	for _, cmd in ipairs(COMMANDS) do
 		vim.api.nvim_create_user_command(cmd.name, function()
 			let_it_snow[cmd.func]()

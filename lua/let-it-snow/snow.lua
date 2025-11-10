@@ -4,9 +4,6 @@ local M = {}
 
 local ns_id = vim.api.nvim_create_namespace(settings.settings.namespace)
 
--- TODO: This doesn't seem to belong here
-local end_command_str = "EndHygge"
-
 M.running = {}
 
 local function clear_snow(buf)
@@ -16,21 +13,8 @@ local function clear_snow(buf)
 	end
 end
 
-local function table_empty(t)
-	for _, _ in pairs(t) do
-		return false
-	end
-	return true
-end
-
 M.end_hygge = function(buf)
 	M.running[buf] = nil
-
-	if table_empty(M.running) then
-		pcall(function()
-			vim.api.nvim_buf_del_user_command(buf, end_command_str)
-		end)
-	end
 end
 
 local function make_grid(height, width)
@@ -115,7 +99,7 @@ local function show_debug_obstructed(buf, grid, lines)
 end
 
 local function show_grid(buf, grid, lines)
-    local height = math.min(#grid, #lines)
+	local height = math.min(#grid, #lines)
 
 	for row = 0, height do
 		for col = 0, #grid[row] do
@@ -284,15 +268,17 @@ M._let_it_snow = function()
 		spawn_snowflake_on_line(row, initial_grid, lines)
 	end
 
-	vim.api.nvim_buf_create_user_command(buf, end_command_str, function()
-		M.end_hygge(buf)
-	end, {})
-
 	M.running[buf] = true
 
 	vim.defer_fn(function()
 		main_loop(buf, initial_grid)
 	end, 0)
+end
+
+M._stop_snow = function(buf)
+	M.running[buf] = nil
+
+	clear_snow(buf)
 end
 
 return M
