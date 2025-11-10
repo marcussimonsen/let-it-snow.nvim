@@ -254,10 +254,7 @@ local function main_loop(buf, grid)
 		return update_grid(buf, grid, lines)
 	end)
 
-	print(result)
-
 	if not status then
-		print("Failed updating grid")
 		M.end_hygge(buf)
 		return
 	end
